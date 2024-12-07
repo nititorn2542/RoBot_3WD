@@ -1,0 +1,38 @@
+<launch>
+  <master auto="start"/>
+  <param name ="use_sim_time" value="false"/>
+
+  <include file="$(find usb_cam)/launch/usb_cam-test.launch"/>
+
+  <!-- color_filter.cpp  -->
+  <node name="rgb_color_filter" pkg="opencv_apps" type="rgb_color_filter" output="screen">
+    <remap from="image" to="/usb_cam/image_raw" />
+    <param name="use_camera_info" value="false" />
+    <param name="debug_view" value="true" />
+    <param name="queue_size" value="3" />
+    <param name="r_limit_max" value="255" />
+    <param name="r_limit_min" value="90" />
+    <param name="g_limit_max" value="255" />
+    <param name="g_limit_min" value="45" />
+    <param name="b_limit_max" value="120" />
+    <param name="b_limit_min" value="0" />
+  </node>
+
+<!-- hough_circles.cpp -->
+  <node name="hough_circles" pkg="opencv_apps" type="hough_circles">
+    <remap from="image" to="/rgb_color_filter/image" />
+    <param name="use_camera_info" value="false" />
+    <param name="debug_view" value="true" />
+    <param name="queue_size" value="3" />
+    <param name="canny_threshold" value="70" />
+    <param name="accumulator_threshold" value="70" />
+    <param name="gaussian_blur_size" value="10" />
+    <param name="gaussian_sigma_x" value="2" />
+    <param name="gaussian_sigma_y" value="2" />
+    <param name="dp" value="2" />
+    <param name="min_circle_radius" value="0" />
+    <param name="max_circle_radius" value="0" />
+  </node>
+
+  <node pkg="rosserial_arduino" type="serial_node.py" name="rosserial" respawn="true"  args="_port:=/dev/ttyUSB0"/>
+</launch>
